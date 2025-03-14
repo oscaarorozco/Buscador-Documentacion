@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de documentación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <link href="/css/aparienciaBuscador.css" rel="stylesheet">
+    <script src="/js/mammoth.browser.min.js"></script>
+    <link rel="stylesheet" href="/css/animate.min.css">
+    <style>
+    </style>
+</head>
+
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar bg-body-tertiary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <p class="fs-5 fw-light m-2">Buscador y gestor de documentación</p>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modal para seleccionar carpeta -->
+    <div class="modal fade" id="folderSelectModal" tabindex="-1" aria-labelledby="folderSelectModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title fs-5" id="folderSelectModalLabel">Seleccionar carpeta</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Por favor, selecciona la carpeta que contiene los archivos .docx.</p>
+                    <button type='button' id='selectFolderBtn' class='btn btn-outline-secondary hb'>
+                        <i class="bi bi-folder-plus"></i> Seleccionar carpeta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control de versiones -->
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+        <div class="offcanvas-header">
+            <p class="offcanvas-title fs-5 fw-light" id="offcanvasBottomLabel">Control de versiones</p>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Contenedor de tarjetas con slider horizontal -->
+            <div id="versionControlContainer" class="horizontal-scroll-container">
+                <!-- Las tarjetas dinámicas de resultados aparecerán aquí -->
+            </div>
+            <hr>
+            <div>
+                <input type="file" id="loadJSONBtn" accept=".json" style="display: none;"
+                    onchange="loadJSONFile(event)">
+                <label for="loadJSONBtn" class="btn btn-outline-secondary hb">
+                    <i class="bi bi-upload"></i> Cargar JSON
+                </label>
+                <button id="downloadJSONBtn" class="btn btn-outline-secondary hb" onclick="downloadUpdatedJSON()">
+                    <i class="bi bi-download"></i> Descargar JSON Actualizado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text area de párrafo a buscar y barra herramientas -->
+    <div class="container mt-0 pt-3">
+        <!-- Text area de párrafo a buscar -->
+        <div class="mb-3">
+            <textarea id="searchInput" class="form-control" rows="3"
+                placeholder="Escribe la palabra o párrafo a buscar"></textarea>
+        </div>
+
+        <!-- Barra de acciones -->
+        <div class="sticky-container d-flex flex-wrap  mb-3">
+            <div class="d-flex flex-wrap">
+                <button id="searchBtn" class="btn btn-outline-secondary h me-2 my-2"><i class="bi bi-search"></i>
+                    Buscar</button>
+                <button id="reload" class="btn btn-outline-secondary h me-2 my-2"><i class="bi bi-folder"></i> Nueva
+                    carpeta</button>
+                <button id="generateLogBtn" class="btn btn-outline-secondary h me-2 my-2"><i
+                        class="bi bi-calendar2-week"></i> Historial</button>
+                <button class="btn btn-outline-secondary h me-2 my-2" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Gestor de versiones</button>
+                <button id="compareBtn" class="btn btn-outline-secondary h me-2 my-2" data-bs-toggle="modal"
+                    data-bs-target="#compareModal">
+                    <i class="bi bi-chat-square-quote"></i> Comparador de texto </button>
+                <di class="d-flex">
+                    <select class="form-select me-2 my-2" id="sortOptions" style="max-width: 180px;">
+                        <option selected>Ordenar</option>
+                        <option value="similarity">Similitud</option>
+                        <option value="date">Última modificación</option>
+                        <option value="alphabetical">Título</option>
+                    </select>
+                    <div class="input-group my-2" style="max-width: 270px;">
+                        <input class="form-control" id="highlightInput" type="text" placeholder="Buscar en resultados">
+                        <button id="prevMatchBtn" class="btn btn-outline-secondary h">
+                            <i class="bi bi-arrow-up"></i>
+                        </button>
+                        <button id="nextMatchBtn" class="btn btn-outline-secondary h">
+                            <i class="bi bi-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal del comparador -->
+        <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="compareModalLabel">Comparar Archivos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Selector de archivo izquierdo -->
+                            <div class="col-md-6">
+                                <label for="leftFileSelect" class="form-label">Archivo consulta:</label>
+                                <div class="d-flex align-items-center mb-3">
+                                    <button id="loadLeftDocxBtn" class="btn btn-outline-secondary hb me-2">
+                                        <i class="bi bi-file-earmark-arrow-up"></i>
+                                    </button>
+                                    <select id="leftFileSelect" class="form-select">
+                                        <!-- Opciones dinámicas generadas por buscador o JSON -->
+                                    </select>
+                                </div>
+                                <!-- Contenido del archivo izquierdo -->
+                                <div id="leftFileContent" class="border p-3 rounded sync-scroll"
+                                    style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+                                    <!-- Contenido dinámico -->
+                                </div>
+                            </div>
+                            <!-- Selector de archivo derecho -->
+                            <div class="col-md-6">
+                                <label for="rightFileSelect" class="form-label">Archivo revisado:</label>
+                                <div class="d-flex align-items-center mb-3">
+                                    <button id="loadRightDocxBtn" class="btn btn-outline-secondary hb me-2">
+                                        <i class="bi bi-file-earmark-arrow-up"></i>
+                                    </button>
+                                    <select id="rightFileSelect" class="form-select">
+                                        <!-- Opciones dinámicas generadas por buscador o JSON -->
+                                    </select>
+                                </div>
+                                <!-- Contenido del archivo derecho -->
+                                <div id="rightFileContent" class="border p-3 rounded sync-scroll"
+                                    style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+                                    <!-- Contenido dinámico -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Resultado de la comparación línea por línea -->
+                        <div id="comparisonResult" class="mt-4 border p-3 rounded bg-light"
+                            style="max-height: 300px; overflow-y: auto;">
+                            <!-- Resultado de las diferencias -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="file" id="loadJSONCompareBtn" accept=".json" style="display: none;"
+                            onchange="loadJSONFile(event)">
+                        <label for="loadJSONCompareBtn" class="btn btn-outline-secondary hb">
+                            <i class="bi bi-upload"></i> Cargar JSON
+                        </label>
+                        <button type="button" id="compareFilesBtn"
+                            class="btn btn-outline-secondary hb">Comparar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Separador -->
+        <hr class="my-4" style="color: white; border-width: 2px;">
+
+        <!-- Div de resaltado y resultados de búsqueda -->
+        <div id="highlightResults">
+            <div id="messageWindow"
+                style="overflow-y: auto; background-color: #f8f9fa; border: 1px solid #ccc; padding: 10px; border-radius: 10px;height: auto;">
+            </div>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="progress-container" style="display: none;">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+            <div class="progress-text">0%</div>
+        </div>
+    </div>
+
+    <!-- Librerías -->
+    <script src="./js/funcionesBuscardorDocumentacion.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        // Botón nueva carpeta
+        const reload = document.getElementById("reload");
+        reload.addEventListener("click", (_) => {
+            location.reload();
+        });
+
+        // Script para mostrar el modal seleccionar carpeta al cargar la página
+        window.onload = function () {
+            const folderSelectModal = new bootstrap.Modal(document.getElementById('folderSelectModal'));
+            folderSelectModal.show();
+        };
+
+        let currentMatchIndex = -1; // Índice de la coincidencia activa
+        let matches = []; // Lista de coincidencias resaltadas
+
+        // Función resaltado en los resultados
+        document.getElementById('highlightInput').addEventListener('input', function () {
+            const searchTerm = this.value.trim(); // Obtiene el texto ingresado
+            const messageWindow = document.getElementById('messageWindow');
+
+            if (searchTerm === '') {
+                // Si no hay texto, elimina los resaltados existentes y conserva el HTML original
+                removeHighlights(messageWindow);
+                matches = [];
+                currentMatchIndex = -1;
+                return;
+            }
+
+            // Escapa caracteres especiales para evitar errores en la expresión regular
+            const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            // Crea una expresión regular para buscar palabras completas
+            const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+
+            // Elimina los resaltados previos antes de aplicar nuevos
+            removeHighlights(messageWindow);
+
+            // Aplica el resaltado a las coincidencias
+            highlightMatches(messageWindow, regex);
+
+            // Actualiza la lista de coincidencias y reinicia el índice activo
+            matches = Array.from(document.querySelectorAll('.highlight'));
+            currentMatchIndex = -1;
+
+            if (matches.length > 0) {
+                navigateToMatch(0); // Selecciona la primera coincidencia automáticamente
+            }
+        });
+
+        document.getElementById('prevMatchBtn').addEventListener('click', function () {
+            if (matches.length === 0) return;
+            currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length; // Ir al anterior resultado
+            navigateToMatch(currentMatchIndex);
+        });
+
+        document.getElementById('nextMatchBtn').addEventListener('click', function () {
+            if (matches.length === 0) return;
+            currentMatchIndex = (currentMatchIndex + 1) % matches.length; // Ir al siguiente resultado
+            navigateToMatch(currentMatchIndex);
+        });
+
+        // Función para eliminar todos los resaltados existentes
+        function removeHighlights(container) {
+            const highlightedElements = container.querySelectorAll('.highlight');
+            highlightedElements.forEach((element) => {
+                const parent = element.parentNode;
+                parent.replaceChild(document.createTextNode(element.textContent), element);
+                parent.normalize(); // Combina nodos de texto adyacentes
+            });
+        }
+
+        // Función para resaltar las coincidencias en un contenedor manteniendo la estructura HTML
+        function highlightMatches(container, regex) {
+            const childNodes = Array.from(container.childNodes);
+            childNodes.forEach((node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (regex.test(text)) {
+                        const highlightedHTML = text.replace(regex, '<span class="highlight">$1</span>');
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = highlightedHTML;
+
+                        while (tempDiv.firstChild) {
+                            container.insertBefore(tempDiv.firstChild, node);
+                        }
+                        container.removeChild(node);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    highlightMatches(node, regex); // Recursividad en elementos hijos
+                }
+            });
+        }
+
+        // Función para navegar a una coincidencia específica
+        function navigateToMatch(index) {
+            matches.forEach((match, i) => {
+                match.classList.remove('active-match'); // Quita la clase activa de todas las coincidencias
+                if (i === index) {
+                    match.classList.add('active-match'); // Agrega la clase activa a la coincidencia actual
+                    match.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Desplázate hasta la coincidencia actual
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

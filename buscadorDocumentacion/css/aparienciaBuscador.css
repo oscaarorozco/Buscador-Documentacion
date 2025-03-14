@@ -1,0 +1,232 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    padding-top: 40px;
+    background-color: #006338;
+    opacity: 1;
+    background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #006338a2 24px), repeating-linear-gradient(#033b1e55, #033b1e);
+    background-size: 100% 100%;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.container {
+    max-width: 100%;
+    padding: 0 15px;
+}
+
+.progress-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.progress {
+    height: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #0063386d;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-weight: bold;
+    color: white;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: green;
+    background-color: rgba(240, 255, 240, 0.582);
+}
+
+.hb2 {
+    border-width: 2px;
+    border-color: #006338;
+    background-color: #006338;
+    color: white;
+}
+
+.hb2:hover {
+    background-color: white;
+    color: #006338;
+}
+
+.hb {
+    border-color: #006338;
+    color: #006338;
+}
+
+.hb:hover {
+    background-color: #006338;
+    color: white;
+}
+
+.h {
+    color: white;
+    border-color: white;
+}
+
+.h:hover {
+    color: #006338;
+    background-color: rgb(255, 255, 255);
+    border-color: #006338;
+}
+
+.result-item {
+    margin-bottom: 10px;
+}
+
+.highlight {
+    background-color: #006338;
+    font-weight: bold;
+    color: white;
+}
+
+.active-match {
+    background-color: #00a45d;
+    border-radius: 4px;
+}
+
+.active-match i {
+    color: white;
+}
+
+.custom-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #006338;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.custom-checkbox:checked {
+    background-color: #006338;
+    border-color: #006338;
+}
+
+.custom-checkbox:checked::after {
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.custom-checkbox:hover {
+    border-color: #00a45d;
+}
+
+.sticky-container {
+    position: sticky;
+    top: 70px;
+    z-index: 100;
+    background-color: #004728b9;
+    backdrop-filter: blur(4px) saturate(100%);
+    -webkit-backdrop-filter: blur(3px) saturate(100%);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 30px 5px #0000004d;
+}
+
+.horizontal-scroll-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px;
+    scrollbar-width: thin;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #006338;
+    border-radius: 4px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.horizontal-scroll-container .card {
+    flex: 0 0 auto;
+    width: auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.horizontal-scroll-container .card-header {
+    background-color: #006338;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.horizontal-scroll-container .btn-close {
+    background-color: transparent;
+    border: none;
+}
+
+.horizontal-scroll-container .card-body {
+    padding: 10px;
+}
+
+#offcanvasBottom {
+    height: 90vh;
+    max-height: none;
+}
+
+.modal-xl {
+    max-width: 90%;
+}
+
+#leftFileContent,
+#rightFileContent,
+#comparisonResult {
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .sticky-container {
+        justify-content: space-between;
+    }
+
+    .sticky-container>div {
+        width: 100%;
+    }
+
+    #sortOptions,
+    #highlightInput {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 575px) {
+    body {
+      min-width: 575px;
+      overflow-x: auto;
+    }
+  }
+  
