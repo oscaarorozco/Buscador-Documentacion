@@ -19,7 +19,7 @@ Aplicación web de búsqueda y gestión de referencias en una serie de documento
 🙋🏻‍♂️ [Oscar Orozco](https://github.com/oscaarorozco)
 
 ## Demo
-🔗 [Enlace Demo](https://buscadordocumentacion.netlify.app/index.html)
+🔗 [Ver demo](https://buscadordocumentacion.netlify.app/index.html)
 
 ## Lenguajes utilizados
 
